@@ -270,6 +270,9 @@ instance : Div eisensteinInt :=
 instance : Mod eisensteinInt :=
   ⟨fun x y ↦ x - y * (x / y)⟩
 
+
+---def x / y to be ⟨(x.re * y.re + x.im * y.im + x.re * y.im) / (y.re^2 + y.im^2 + y.re * y.im)的最近整数, (x.im * y.re -x.re * y.im) / (y.re^2 + y.im^2 + y.re * y.im)的最近整数⟩
+
 theorem div_def (x y : eisensteinInt) :
     x / y = ⟨Int.div' (x * conj y).re (norm y), Int.div' (x * conj y).im (norm y)⟩ :=
   rfl
@@ -285,10 +288,11 @@ theorem norm_mod_lt (x : eisensteinInt) {y : eisensteinInt} (hy : y ≠ 0) :
   have H2 : norm (x % y) * norm y ≤ norm y / 2 * norm y
   · calc
       norm (x % y) * norm y = norm (x % y * conj y) := by simp only [norm_mul, norm_conj]
-      _ = |Int.mod' (x.re * y.re + x.im * y.im) (norm y)| ^ 2
-          + |Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)| ^ 2 := by simp [H1, norm, sq_abs]
-      _ ≤ (y.norm / 2) ^ 2 + (y.norm / 2) ^ 2 := by gcongr <;> apply Int.abs_mod'_le _ _ norm_y_pos
-      _ = norm y / 2 * (norm y / 2 * 2) := by ring
+      _ = |Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)| ^ 2
+          + |Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)| ^ 2
+          + (Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)) * (Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)):= by simp [H1, norm, sq_abs]
+      _ ≤ (y.norm / 2) ^ 2 + (y.norm / 2) ^ 2 + (y.norm / 2) ^ 2:= by gcongr <;> apply Int.abs_mod'_le _ _ norm_y_pos
+      _ = norm y / 2 * (norm y / 2 * 3) := by ring
       _ ≤ norm y / 2 * norm y := by gcongr; apply Int.ediv_mul_le; norm_num
   calc norm (x % y) ≤ norm y / 2 := le_of_mul_le_mul_right H2 norm_y_pos
     _ < norm y := by
