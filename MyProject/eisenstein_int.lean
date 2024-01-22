@@ -1,6 +1,7 @@
 import Mathlib.Data.Int.Basic
 import Mathlib.Algebra.EuclideanDomain.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
+import Mathlib.Tactic.GCongr
 
 
 @[ext]
@@ -285,17 +286,28 @@ theorem norm_mod_lt (x : eisensteinInt) {y : eisensteinInt} (hy : y ≠ 0) :
   have norm_y_pos : 0 < norm y := by rwa [norm_pos]
   have H1 : x % y * conj y = ⟨Int.mod' (x * conj y).re (norm y), Int.mod' (x * conj y).im (norm y)⟩
   · ext <;> simp [Int.mod'_eq, mod_def, div_def, norm] <;> ring
-  have H2 : norm (x % y) * norm y ≤ norm y / 2 * norm y
+  have H2 : 4 * norm (x % y) * norm y ≤ 3 * norm y * norm y
   · calc
-      norm (x % y) * norm y = norm (x % y * conj y) := by simp only [norm_mul, norm_conj]
-      _ = |Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)| ^ 2
-          + |Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)| ^ 2
-          + (Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)) * (Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)):= by simp [H1, norm, sq_abs]
-      _ ≤ (y.norm / 2) ^ 2 + (y.norm / 2) ^ 2 + (y.norm / 2) ^ 2:= by gcongr <;> apply Int.abs_mod'_le _ _ norm_y_pos
-      _ = norm y / 2 * (norm y / 2 * 3) := by ring
-      _ ≤ norm y / 2 * norm y := by gcongr; apply Int.ediv_mul_le; norm_num
-  calc norm (x % y) ≤ norm y / 2 := le_of_mul_le_mul_right H2 norm_y_pos
-    _ < norm y := by
+      4 * (norm (x % y) * norm y) = 4 * norm (x % y * conj y) := by simp only [norm_mul, norm_conj]
+      _ = 4 * |Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)| ^ 2
+          + 4 * |Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)| ^ 2
+          + 4 * (Int.mod' (x.re * y.re + x.im * y.im + x.re * y.im) (norm y)) * (Int.mod' (-(x.re * y.im) + x.im * y.re) (norm y)):= by
+          simp [H1, norm, sq_abs]
+          ring_nf
+      _ ≤ 4 * ((y.norm / 2) ^ 2) + 4 * ((y.norm / 2) ^ 2) + 4 * ((y.norm / 2) ^ 2):= by
+        gcongr ?_ + ?_ + ?_
+        gcongr <;> apply Int.abs_mod'_le _ _ norm_y_pos
+        sorry
+      _ ≤ 3 * norm y * norm y := by
+          have h'' : (norm y / 2) * 4 ≤ norm y  := by
+            simp only [norm, div_def, norm_mul, norm_conj]
+            ring_nf
+            apply Int.ediv_mul_le
+            sorry
+      ----apply Int.ediv_lt_of_lt_mul
+      ----simp [div_def, norm]; ring ;
+  calc norm (x % y) < norm y := by
+        sorry
         apply Int.ediv_lt_of_lt_mul
         · norm_num
         · linarith
