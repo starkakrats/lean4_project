@@ -344,7 +344,6 @@ instance : EuclideanDomain eisensteinInt :=
     remainder_lt := natAbs_norm_mod_lt
     mul_left_not_lt := not_norm_mul_left_lt_norm }
 
-example (x : eisensteinInt) : Irreducible x ↔ Prime x :=
-  PrincipalIdealRing.irreducible_iff_prime
+instance : IsPrincipalIdealRing eisensteinInt := inferInstance
 
 end eisensteinInt
