@@ -2,6 +2,8 @@ import Mathlib.Data.Int.Basic
 import Mathlib.Algebra.EuclideanDomain.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Tactic.GCongr
+import Mathlib
+--import other .lean file
 
 
 @[ext]
@@ -347,3 +349,27 @@ instance : EuclideanDomain eisensteinInt :=
 instance : IsPrincipalIdealRing eisensteinInt := inferInstance
 
 end eisensteinInt
+open Polynomial
+open BigOperators
+noncomputable section
+def fq:ℚ[X]:=(X^2+C 3)
+
+
+structure K_eq_eisenstein (K : Type u_7) (eisensteinInt : Type u_8) [Mul K] [Mul eisensteinInt] [Add K] [Add eisensteinInt] extends Equiv :
+  Type (max u_7 u_8)
+toFun : K → eisensteinInt :=
+  fun (x : K) =>
+  have ⟨ α , β , h⟩  :=K_basis_sum X
+  ⟨⟨α - β , 2 * β ⟩⟩
+invFun : eisensteinInt → K :=
+  fun (x : eisensteinInt) => (x.re : Q) + (x.im : Q) / 2 + ( (x.im : Q) / 2 ) * AdjointRoot.root fq
+left_inv : Function.LeftInverse self.invFun self.toFun
+right_inv : Function.RightInverse self.invFun self.toFun
+map_mul' : ∀ (x y : K), Equiv.toFun self.toEquiv (x * y) = Equiv.toFun self.toEquiv x * Equiv.toFun self.toEquiv y := by
+  intros
+  ext <;> simp <;> ring
+map_add' : ∀ (x y : K), Equiv.toFun self.toEquiv (x + y) = Equiv.toFun self.toEquiv x + Equiv.toFun self.toEquiv y := by
+  intros
+  ext <;> simp <;> ring
+
+instance : IsPrincipalIdealRing K := inferInstance ---OK?
