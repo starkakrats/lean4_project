@@ -306,10 +306,9 @@ theorem norm_mod_lt (x : eisensteinInt) {y : eisensteinInt} (hy : y ≠ 0) :
             ring_nf
             apply Int.ediv_mul_le
             sorry
-      ----apply Int.ediv_lt_of_lt_mul
+      -----apply Int.ediv_lt_of_lt_mul
       ----simp [div_def, norm]; ring ;
   calc norm (x % y) < norm y := by
-        sorry
         apply Int.ediv_lt_of_lt_mul
         · norm_num
         · linarith
